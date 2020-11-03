@@ -17,7 +17,11 @@ class Solution:
             if sym in Solution.literals:
                 stack.append(RegLanguage(self.__k, sym))
             elif sym != '*':
+                if len(stack) == 0:
+                    raise RuntimeError("Error")
                 l2 = stack.pop()
+                if len(stack) == 0:
+                    raise RuntimeError("Error")
                 l1 = stack.pop()
 
                 if sym == '+':
@@ -25,6 +29,9 @@ class Solution:
                 elif sym == '.':
                     stack.append(RegLanguage.concatenate(l1, l2))
             else:
+                if len(stack) == 0:
+                    raise RuntimeError("Error")
+
                 l1 = stack.pop()
                 stack.append(RegLanguage.closure(l1))
 
