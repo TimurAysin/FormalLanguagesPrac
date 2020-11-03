@@ -15,7 +15,7 @@ class Solution:
 
         for sym in self.__lang:
             if sym in Solution.literals:
-                stack.append(RegLanguage(sym))
+                stack.append(RegLanguage(self.__k, sym))
             elif sym != '*':
                 l2 = stack.pop()
                 l1 = stack.pop()
@@ -32,3 +32,8 @@ class Solution:
 
     def solve(self):
         self.make_language()
+
+        if self.__l in self.__reg_lang.lengths:
+            print("YES")
+        else:
+            print("NO")

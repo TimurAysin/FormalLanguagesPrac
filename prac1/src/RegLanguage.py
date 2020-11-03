@@ -5,6 +5,7 @@ class Vertex:
     def __init__(self):
         self.is_terminal = True
         self.edges = dict()
+        self.has_cycle = False
 
     def make_edge(self, vtx, ch):
         if not isinstance(vtx, Vertex):
@@ -21,29 +22,30 @@ class Vertex:
 
 class RegLanguage:
 
-    def __init__(self, sym):
+    def __init__(self, k1, sym):
+        self.k = k1
+        self.lengths = set()
         if sym is None:
-            self.vtx = [Vertex()]
-            self.start_ind = 0
-            self.final_ind = [0]
+            self.start = Vertex()
+            self.finals = [self.start]
+            self.lengths.add(0)
             return
 
-        self.vtx = []
-        self.start_ind = 0
-        self.final_ind = []
+        self.start = 0
+        self.finals = []
 
         vtx1 = Vertex()
         vtx2 = Vertex()
 
         vtx1.is_terminal = False
+        vtx1.make_edge(vtx2, sym)
 
-        self.final_ind.append(1)
-        self.start_ind = 0
-
-        self.vtx.append(vtx1)
-        self.vtx.append(vtx2)
-
-        self.vtx[0].make_edge(self.vtx[1], sym)
+        self.finals.append(vtx2)
+        self.start = vtx1
+        if sym != '1':
+            self.lengths.add(1)
+        else:
+            self.lengths.add(0)
 
     @staticmethod
     def concatenate(l1, l2):
@@ -51,18 +53,16 @@ class RegLanguage:
             raise ValueError()
 
         new_lang = copy.copy(l1)
-        offset = len(l1.vtx)
+        new_lang.finals = l2.finals
 
-        new_lang.vtx += l2.vtx
+        for ind in range(len(l1.finals)):
+            l1.finals[ind].make_edge(l2.start, '1')
+            l1.finals[ind].is_terminal = False
 
-        for ind in l1.final_ind:
-            new_lang.vtx[ind].make_edge(new_lang.vtx[l2.start_ind + offset], '1')
-            new_lang.vtx[ind].is_terminal = False
-
-        new_lang.final_ind = []
-
-        for ind in l2.final_ind:
-            new_lang.final_ind.append(ind + offset)
+        new_lang.lengths = set()
+        for x in l1.lengths:
+            for y in l2.lengths:
+                new_lang.lengths.add((x + y) % new_lang.k)
 
         return new_lang
 
@@ -71,21 +71,16 @@ class RegLanguage:
         if not isinstance(l1, RegLanguage) or not isinstance(l2, RegLanguage):
             raise ValueError()
 
-        new_lang = RegLanguage(None)
-        new_lang.vtx[0].is_terminal = False
-        new_lang.vtx += l1.vtx
-        new_lang.final_ind = l1.final_ind
-        new_lang.vtx[0].make_edge(new_lang.vtx[1], '1')
+        new_lang = RegLanguage(l1.k, None)
+        new_lang.start.is_terminal = False
 
-        for i in range(len(new_lang.final_ind)):
-            new_lang.final_ind[i] += 1
+        new_lang.finals = l1.finals
+        new_lang.finals += l2.finals
 
-        new_lang.vtx += l2.vtx
-        for i in range(len(l2.final_ind)):
-            l2.final_ind[i] += 1 + len(l1.vtx)
+        new_lang.start.make_edge(l1.start, '1')
+        new_lang.start.make_edge(l2.start, '1')
 
-        new_lang.final_ind += l2.final_ind
-        new_lang.vtx[0].make_edge(new_lang.vtx[1 + len(l1.vtx)], '1')
+        new_lang.lengths = l1.lengths.union(l2.lengths)
 
         return new_lang
 
@@ -94,13 +89,22 @@ class RegLanguage:
         if not isinstance(l1, RegLanguage):
             raise ValueError()
 
-        new_lang = RegLanguage(None)
+        new_lang = RegLanguage(l1.k, None)
 
-        new_lang.vtx += l1.vtx
-        new_lang.vtx[0].make_edge(new_lang.vtx[1], '1')
+        new_lang.start.make_edge(l1.start, '1')
 
-        for ind in l1.final_ind:
-            new_lang.vtx[1 + ind].make_edge(new_lang.vtx[0], '1')
-            new_lang.vtx[1 + ind].is_terminal = False
+        for vtx in l1.finals:
+            vtx.make_edge(new_lang.start, '1')
+            vtx.is_terminal = False
+
+        for x in l1.lengths:
+            x %= new_lang.k
+            new_lang.lengths.add(x)
+            sx = x * 2 % new_lang.k
+
+            while sx != x and sx not in new_lang.lengths:
+                new_lang.lengths.add(sx)
+                sx += x
+                sx %= new_lang.k
 
         return new_lang
