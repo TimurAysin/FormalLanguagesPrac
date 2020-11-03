@@ -1,4 +1,4 @@
-from src.RegLanguage import RegLanguage, Vertex
+from RegLanguage import RegLanguage, Vertex
 
 
 class Solution:
@@ -41,6 +41,6 @@ class Solution:
         self.make_language()
 
         if self.__l in self.__reg_lang.lengths:
-            print("YES")
+            return "YES"
         else:
-            print("NO")
+            return "NO"

@@ -1,4 +1,4 @@
-from src.solver import Solution
+from solver import Solution
 
 
 def main():
@@ -8,7 +8,7 @@ def main():
     l = int(s[2])
 
     solver = Solution(lang, k, l)
-    solver.solve()
+    print(solver.solve())
 
 
 if __name__ == "__main__":
