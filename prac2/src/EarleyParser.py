@@ -37,15 +37,18 @@ class EarleyParser:
                 change1 = self.complete(j)
                 change2 = self.predict(j)
 
-            print("D_%d = {" %(j))
-            for state in self.situations[j]:
-                print("[{} -> {}, {}]".format(state.from_w, state.to_w, state.start_index))
-            print("}")
+            #self.print_situations(j)
 
         for state in self.situations[len(word)]:
             if state.from_w == '#' and state.to_w == "S." and state.start_index == 0:
                 return True
         return False
+
+    def print_situations(self, j):
+        print("D_%d = {" % j)
+        for state in self.situations[j]:
+            print("[{} -> {}, {}]".format(state.from_w, state.to_w, state.start_index))
+        print("}")
 
     def scan(self, j):
         if j == 0:
