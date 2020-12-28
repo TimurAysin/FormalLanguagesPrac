@@ -97,14 +97,38 @@ class RegLanguage:
             vtx.make_edge(new_lang.start, '1')
             vtx.is_terminal = False
 
-        for x in l1.lengths:
-            x %= new_lang.k
-            new_lang.lengths.add(x)
-            sx = x * 2 % new_lang.k
 
-            while sx != x and sx not in new_lang.lengths:
-                new_lang.lengths.add(sx)
-                sx += x
-                sx %= new_lang.k
+        # O(K^2)
+        known_values = [0] * new_lang.k
+        for x in l1.lengths:
+            known_values[x] = 1
+
+        queue = list(l1.lengths)
+
+        i = 0
+        k = new_lang.k
+        while True:
+            first_elem = queue[i]
+            j = 0
+
+            add_later = []
+            while j < len(queue):
+                to_add = (queue[j] + first_elem) % k
+                if not known_values[to_add]:
+                    add_later.append(to_add)
+                    known_values[to_add] = 1
+                j += 1
+
+            queue += add_later
+
+            if i < len(queue) - 1:
+                i += 1
+            else:
+                break
+
+        new_lang.lengths = set()
+        for x in range(k):
+            if known_values[x] == 1:
+                new_lang.lengths.add(x)
 
         return new_lang

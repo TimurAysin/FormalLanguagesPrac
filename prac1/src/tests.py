@@ -2,8 +2,18 @@ from solver import Solution
 
 
 def main():
-    tests = [["ab+c.aba.*.bac.+.+* 3 2", "YES"], ["acb..bab.c.*.ab.ba.+.+*a. 3 0", "NO"],
-              ["ab+ 3 0", "NO"], ["ab.* 4 2", "YES"]]
+    tests = [["ab+c.aba.*.bac.+.+* 3 2", "YES"],
+             ["acb..bab.c.*.ab.ba.+.+*a. 3 0", "NO"],
+             ["ab+ 3 0", "NO"],
+             ["ab.* 4 2", "YES"],
+             ["aa.aaa..+* 6 5", "YES"],
+             ["aa.aaa..+* 15 14", "YES"],
+             ["aa.aaa..+* 15 0", "YES"],
+             ["ab. 5 0", "NO"],
+             ["ab. 5 2", "YES"],
+             ["ab+ 5 1", "YES"],
+             ["ab+ 5 2", "NO"]
+             ]
 
     for test in tests:
         print(test)
